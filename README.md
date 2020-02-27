@@ -1,88 +1,84 @@
-# autoware-1.8.0-test
+[![Autoware](https://www.autoware.ai/static/img/autoware_web_img.png)](https://www.autoware.ai)
 
-测试环境：
-ubuntu 16.04
-ros kinetic
-qt5.6.2
-opencv 3.4.8 
-opencv安装参考：https://blog.csdn.net/CSDNZSX/article/details/104154645
+| *master* | *develop* |
+|----------|-----------|
+|[![Build Status](https://travis-ci.org/CPFL/Autoware.svg?branch=master)](https://travis-ci.org/CPFL/Autoware)|[![Build Status](https://travis-ci.org/CPFL/Autoware.svg?branch=develop)](https://travis-ci.org/CPFL/Autoware)|
 
-autoware 1.8.0
-autoware安装参考：https://gitlab.com/autowarefoundation/autoware.ai/autoware/-/wikis/Source-Build
-autoware1.8.0版本源码：https://gitlab.com/autowarefoundation/autoware.ai/autoware/-/tree/1.8.0
+[Autoware](https://www.autoware.ai) is the world's first "all-in-one" open-source software for self-driving vehicles. The capabilities of Autoware are primarily well-suited for urban cities, but highways, freeways, mesomountaineous regions, and geofenced areas can be also covered. The code base of Autoware is protected by the BSD License. Please use it at your own discretion. For safe use, we provide a ROSBAG-based simulation environment for those who do not own real autonomous vehicles. If you plan to use Autoware with real autonomous vehicles, **please formulate safety measures and assessment of risk before field testing.**
 
-autoware安装过程：
-$ cd ~/autoware-1.8.0/ros/src
-$ catkin_init_workspace
-$ cd ../
-$ rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
-这里如果报错参考下面的bug参考
-$ ./catkin_make_release
+You may refer to [Autoware Wiki](https://github.com/CPFL/Autoware/wiki) for **Users Guide** and **Developers Guide**.
 
-编译有bug参考：
-https://blog.csdn.net/yourgreatfather/article/details/86504547
+## What Is Autoware
 
-矢量地图编辑：
-https://tools.tier4.jp/
-全局规划，局部规划，避障都依赖矢量地图。
+[![Autoware Overview](docs/images/autoware_overview.png)](https://github.com/CPFL/Autoware/wiki/Overview)
 
-自己增加了cpp文件夹里面的代码，以适应每一辆小车使用。
-1、speed.cpp 速度转化，将autoware里面的/twist_cmd转化为常用的/cmd_vel
-2、point_test.cpp 原始点云裁剪为所需要的点云，还有聚类
-3、由于聚类后还需要将聚类的点云簇框选出来，还没时间仔细看源码，暂时用网上的euclidean_cluster，参考：https://download.csdn.net/download/cquszj/12088810
-4、click.cpp 将聚类后框选出来的障碍物的x,y坐标回调回来，再转化为/clicked_point主题发送，适应autoware里面的op_perception_simulator功能模块。目前只能添加一个障碍物，还不能做到多障碍物共同添加进去。
+Autoware provides a rich set of self-driving modules composed of sensing, computing, and actuation capabilities. An overview of those capabilities is described [here](https://github.com/CPFL/Autoware/wiki/Overview). Keywords include *Localization, Mapping, Object Detection & Tracking, Traffic Light Recognition, Mission & Motion Planning, Trajectory Generation, Lane Detection & Selection, Vehicle Control, Sensor Fusion, Cameras, LiDARs, RADARs, Deep Learning, Rule-based System, Connected Navigation, Logging, Virtual Reality, and so on*.
 
-autoware本身作者修改了一个小参数，导致本地规划时候不能完全识别障碍物，将lidar_kf_contour_track_core.cpp里面的126行，nh.getParam("/lidar_kf_contour_track/enableTTC", m_Praams.bEnableTTC);原本注释掉的修改回去。实际测试时候可以识别障碍物。
+Free manuals can be also found at [Autoware-Manuals](https://github.com/CPFL/Autoware-Manuals). You are encouraged to contribute to the maintenance of these manuals. Thank you for your cooperation!
 
-修改op_perception_simulator_core.cpp的代码，增加聚类后的/detected_bounding_boxs回调，使用障碍物动态的长宽高尺寸，替换原本固定的长宽高尺寸。
+## Getting Started
 
-实际绕行测试：
-1、启动雷达
-$ roslaunch rslidar_pointcloud rs_lidar_16.launch
-雷达的fram_id改为/velodyne，雷达的点云主题改为/points_raw
+[![Autoware Demo](docs/images/autoware_demo.png)](https://github.com/CPFL/Autoware/wiki/Demo)
 
-2、启动autoware
-绕行方案 总结（本地绕行）：
-启动Autoware本地规划仿真：
-Setup
-->TF
-->Vehicle Info
+### Recommended System Specifications
 
-Map
-->Point Cloud
-->Vector Map
-->TF
+- Number of CPU cores: 8
+- RAM size: 32GB
+- Storage size: 64GB+
 
-Computing
-->Localization->autoware_connector->vel_pose_connector
-选择Simulation Mode
+### Users Guide
 
-->Detection->lidar_tracker->lidar_kf_contour_track
+1. [Installation](https://github.com/CPFL/Autoware/wiki/Installation)
+    1. [Docker](https://github.com/CPFL/Autoware/wiki/Docker)
+    1. [Source](https://github.com/CPFL/Autoware/wiki/Source-Build)
+1. [Demo](https://github.com/CPFL/Autoware/wiki/Demo)
+1. [Field Test](https://github.com/CPFL/Autoware/wiki/Field-Test)
+1. [Videos](https://github.com/CPFL/Autoware/wiki/videos)
 
-->Mission Planning->OpenPlanner-Global Planning->op_global_planner
-选择Rviz Goals
-这时候在RVIZ上面显示的矢量地图的道路上选择起点和终点
+### Developers Guide
 
-->Motion Planning->OpenPlanner-Local_planning里面5个模块都要勾选
-->op_common_param
-->op_trajectory_generator
-->op_motion_predictor 选择Enable Branching
-->op_trajectory_evaluator 选择Enable Prediction
-->op_behavior_selector
+1. [Contribution Rules](https://github.com/CPFL/Autoware/wiki/Contribution-Rules) (**Must Read**)
+1. [Overview](https://github.com/CPFL/Autoware/wiki/Overview)
+1. [Specification](https://github.com/CPFL/Autoware/wiki/Specification)
 
-->OpenPlanner-Simulator->op_perception_simulator
 
-->waypoint_follower->twist_filter
-->waypoint_follower->pure_pursuit小车行走
+## Research Papers for Citation
 
-这时候在RVIZ上给仿真小车设置起点（需要在矢量地图的道路上），会出现绿色方框的小车和白色外圆圈的仿真雷达数据
-然后在RVIZ上点击Op Flag，给局部路径设置障碍物位置
+1. S. Kato, S. Tokunaga, Y. Maruyama, S. Maeda, M. Hirabayashi, Y. Kitsukawa, A. Monrroy, T. Ando, Y. Fujii, and T. Azumi,``Autoware on Board: Enabling Autonomous Vehicles with Embedded Systems,'' In Proceedings of the 9th ACM/IEEE International Conference on Cyber-Physical Systems (ICCPS2018),  pp. 287-296, 2018. [Link](https://dl.acm.org/citation.cfm?id=3207930)
 
-3、启动点云裁剪、聚类和发布障碍物坐标
-$ rosrun point_test point_test
-$ roslaunch euclidean_cluster euclidean_cluster.launch
-$ rosrun point_test click
+2. S. Kato, E. Takeuchi, Y. Ishiguro, Y. Ninomiya, K. Takeda, and T. Hamada. ``An Open Approach to Autonomous Vehicles,'' IEEE Micro, Vol. 35, No. 6, pp. 60-69, 2015. [Link](https://ieeexplore.ieee.org/document/7368032/)
 
-4、启动真实小车
-$ rosrun point_test speed //这个是速度转化
-$ rosrun point_test main //这个小车跟底盘通讯的/cmd_vel主题，结合自己实际写
+## Cloud Services
+
+### Autoware Online
+
+You may test Autoware at [Autoware Online](http://autoware.online/). No need to install the Autoware repository to your local environment.
+
+### Automan
+
+You may annotate and train your ROSBAG data using your web browser through [Automan](https://www.automan.ai). The trained models can be used for deep neural network algorithms in Autoware, such as SSD and Yolo.
+
+### ROSBAG STORE
+
+You may download a number of test and simulation data sets from Tier IV's [ROSBAG STORE](https://rosbag.tier4.jp). Note that free accounts would not allow you to access image data due to privacy matters. 
+
+### Map Tools
+
+You may create 3D map data through Tier IV's [Map Tools](https://maptools.tier4.jp/). The 3D map data used in Autoware are composed of point cloud structure data and vector feature data.
+
+## License
+
+Autoware is provided under the [New BSD License](https://github.com/CPFL/Autoware/blob/master/LICENSE).
+
+## Contact
+
+Autoware Developers Slack Team (https://autoware.herokuapp.com/)
+
+Autoware Developers (<autoware@googlegroups.com>)
+
+To subscribe to the Autoware Developers mailing list,
+- If you have a Google account, go to https://groups.google.com/d/forum/autoware, and click the **Apply to Join Group** button.
+- If you don't have a Google account, send an email to autoware+subscribe@googlegroups.com.
+
+***
+<div align="center"><img src="docs/images/autoware_logo_1.png" width="400"/></div>
